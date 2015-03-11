@@ -3,25 +3,62 @@
 #include "ece556.h"
 
 int readBenchmark(const char *fileName, routingInst *rst){
-  /*********** TO BE FILLED BY YOU **********/  
-	using namespace std;
-	int gx, gy;
-	char* str;
-
-	ifstream inf(fileName);
-	if(!inf){
-		return 0;
-	}
-	std:: string token;
-	std:: string strInput;	
-	while(inf){
-		getline(inf, strInput);
-		while(getline(strInput, token, " ")){
-				cout << token;
-				cout << strInput << endl;
+	/*********** TO BE FILLED BY YOU **********/  
+	char trash[10], g1[10], g2[10], capacity[10], n0[10], n1[10], nodeName[10], numNets[10], numNodes[10];
+	int i, j, intNumNets, intNumNodes;
+	FILE *input;
+  
+  if((input = fopen(fileName, "r")) == NULL){
+	  fprintf(stderr, "Could not read file\n");
+	  return 1;
+  }
+  
+  	fscanf(input, "%s %s %s", trash, g1, g2);
+  	(*rst).gx = atoi(g1);
+  	(*rst).gy = atoi(g2);
+  	fprintf(stderr,"The input was: %s\n", trash);
+  	
+	fscanf(input, "%s %s\n", trash, capacity);
+	(*rst).cap = atoi(capacity);
+	fprintf(stderr,"%s %s\n", trash, capacity);
+	
+	fscanf(input, "%s %s %s\n", trash, trash, numNets);
+	fprintf(stderr,"%s %s %s\n", trash, trash, numNets);
+	intNumNets = atoi(numNets);
+	(*rst).numNets = intNumNets;
+	
+	net  *newNetArray;
+	newNetArray = (net*)malloc(intNumNets*sizeof(net));
+	((*rst).nets)= newNetArray;
+	fprintf(stderr,"it works?\n");
+	
+	for(i = 0; i < intNumNets; i++){
+		
+		fscanf(input, "%s %s\n", nodeName, numNodes);
+		intNumNodes = atoi(numNodes);
+		fprintf(stderr, numNodes+"\n");
+		
+		net *newNet = (net*)malloc(sizeof(net));
+		(*newNet).numPins = intNumNodes;
+		
+		for(j = 0; j < intNumNodes; j++){
+			
+			fscanf(input, "%s %s\n", n0, n1);
+			fprintf(stderr, "%s %s\n", n0, n1);
+			
+			
+			point *newPoint = (point*)malloc(sizeof(point));
+			(*newPoint).x = atoi(n0);
+			(*newPoint).y = atoi(n1);
+			fprintf(stderr, "here\n");
+			(*newNet).pins[j] = *newPoint;
 		}
+		(*rst).nets[i] = *newNet;
 	}
 	
+  fclose(input);// closes the file we opened
+
+  return 1;
 
   return 1;
 }
