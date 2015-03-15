@@ -10,6 +10,7 @@
 #include <string>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
  /**
   * A structure to represent a 2D Point. 
@@ -121,6 +122,12 @@ int solveRouting(routingInst *rst);
      output: 1 if successful, 0 otherwise 
   */
  int release(routingInst *rst);
+ 
+ int pointsToEdge(int x, int y, int x1, int y1, int x2, int y2);
+
+ int edgeToPoints(int x, int y, int edgeNum, int* retInts);
+ 
+ 
 
 
 #endif // ECE556_H
