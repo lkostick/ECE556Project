@@ -280,25 +280,32 @@ return 1;
 // Output: We will output 1 on successful completion of deallocation of
 //			the memory.
 int release(routingInst *rst){
+<<<<<<< HEAD
 	
 
 	int i,j,k;
 	int sizeNets, sizePins, sizeSegments;
+=======
+  /*********** TO BE FILLED BY YOU **********/
+	int i,j;
+	int sizeNets,sizeSegments;
+>>>>>>> 109e70d0f2c328d0652d9e137fea633c0db54daa
 	if(rst == NULL) return 0;
 	sizeNets = rst->numNets;
 	for(i = 0; i < sizeNets; i++){ // Iterate through all the nets in the routing instance
-		sizePins = rst->nets[i].numPins;
-		for(j = 0; j < sizePins; j++){ // Iterate through the pins for each net struct
-			free(rst->nets[i].pins[j]);
-		}
+		free(rst->nets[i].pins);
 		sizeSegments = rst->nets[i].nroute.numSegs;
-		for(k = 0; k < sizeSegments; k++){ // Iterate through the segements in the route 
-			free(rst->nets[i].nroute.segments[k].edges);
-			free(rst->nets[i].nroute.segments[k]);
+		for(j = 0; j < sizeSegments; j++){ // Iterate through the segements in the route 
+			free(rst->nets[i].nroute.segments[j].edges);
 		}
+<<<<<<< HEAD
 		free(rst->nets[i].nroute);
 		free((rst).nets[i]);
+=======
+		free(rst->nets[i].nroute.segments);
+>>>>>>> 109e70d0f2c328d0652d9e137fea633c0db54daa
 	}
+	free(rst->nets);
 	free(rst->edgeCaps);
 	free(rst->edgeUtils);
 	free(rst);
