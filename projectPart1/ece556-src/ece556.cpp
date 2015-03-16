@@ -21,12 +21,11 @@ int readBenchmark(const char *fileName, routingInst *rst){
 	int intx1, inty1, intx2, inty2, intnewCap, edge;
 	// Initializes the FILE pointer we will use to read the input file
 	FILE *input;
-  input = fopen(fileName, "r");/*
   if((input = fopen(fileName, "r")) == NULL){
 	  fprintf(stderr, "Could not read file\n");
 	  fprintf(stderr, "pointer: %p\n", input);
 	  return 1;
-  }*/
+  }
 
   
 	// This scan and store statement scans the first line of the input
@@ -115,7 +114,6 @@ int readBenchmark(const char *fileName, routingInst *rst){
 
 	fscanf(input, "%s\n", numBlockages);
 	intNumBlockages = atoi(numBlockages);
-	fprintf(stderr, numBlockages);
 	for(i = 0; i < intNumBlockages; i++){
 		
 		fscanf(input, "%s %s %s %s %s\n", x1, y1, x2, y2, newCap);
@@ -125,7 +123,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
 		inty2 = atof(y2); 
 		intnewCap = atoi(newCap);
 		edge = 0;
-		fprintf(stderr, "x1:%s y1:%s x2:%s y2:%s Cap:%s\n", x1, y1, x2, y2, newCap);
+		//fprintf(stderr, "x1:%s y1:%s x2:%s y2:%s Cap:%s\n", x1, y1, x2, y2, newCap);
 		
 		edge = pointsToEdge(h1, h2, intx1, inty1, intx2, inty2);
 		
@@ -135,11 +133,7 @@ int readBenchmark(const char *fileName, routingInst *rst){
 	for(i = 0; i < (intNumEdges); i++){
 		(*rst).edgeUtils[i] = 0;
 	}
-	fprintf(stderr, "Got Hereaefawefaewf\n");
-	fprintf(stderr, "pointer: %p\n", input);
 	fclose(input);
-	fprintf(stderr, "Got Here\n");
-  
  
   return 1;
 }
@@ -172,7 +166,6 @@ for(i = 0; i < numbNets; i ++){
 		// 
 		point pin1 = (*rst). nets[i].pins[j];
 		point pin2 = (*rst). nets[i].pins[j+1];
-		fprintf(stderr, "pins pins: (%d,%d)-(%d,%d)\n", pin1.x, pin1.y, pin2.x, pin2.y);
 		
 		segment curSeg;
 		
@@ -240,15 +233,13 @@ if((output = fopen(outRouteFile, "w")) == NULL){
 	  return 0;
 }
 
-int xDistance, yDistance, newX, newY;
+int xDistance, newX;
 
 for(i = 0; i < (*rst).numNets; i ++){
 	
-	fprintf(stderr, "n%d\n", i);
 	fprintf(output, "n%d\n", (*rst).nets[i].id);
 
 	numberSegs = (*rst).nets[i].nroute.numSegs;
-	fprintf(stderr, "Number Segments:%d\n", numberSegs);
 	for(j = 0; j < numberSegs; j ++){
 
 		// initializes new points and sets them equal to the start and
@@ -257,18 +248,14 @@ for(i = 0; i < (*rst).numNets; i ++){
 		point point1, point2;
 		point1 = (*rst).nets[i].nroute.segments[j].p1;
 		point2 = (*rst).nets[i].nroute.segments[j].p2;
-		fprintf(stderr, "Is logans shitty code broke?\n");
-		xDistance = abs(point1.x - point2.x);
-		yDistance = abs(point1.y - point2.y);
+		xDistance = abs(point1.x-point2.x);
 		if(point1.x < point2.x){
 			newX = point1.x + xDistance;
 			fprintf(output,"(%d,%d)-(%d,%d)\n", point1.x, point1.y, point2.x, point1.y);
-			fprintf(stderr,"(%d,%d)-(%d,%d)\n", point1.x, point1.y, point2.x, point1.y);
 		}
 		else if(point2.x<point1.x){
 			newX = point2.x + xDistance;
 			fprintf(output,"(%d,%d)-(%d,%d)\n", point2.x, point2.y, point1.x, point2.y);
-			fprintf(stderr,"(%d,%d)-(%d,%d)\n", point2.x, point2.y, point1.x, point2.y);
 		}
 		if(point1.y < point2.y){
 			if(point1.x > point2.x){
@@ -277,7 +264,6 @@ for(i = 0; i < (*rst).numNets; i ++){
 				newX = point2.x;
 			}
 			fprintf(output,"(%d,%d)-(%d,%d)\n", newX, point1.y, newX, point2.y);
-			fprintf(stderr,"(%d,%d)-(%d,%d)\n", newX, point1.y, newX, point2.y);
 		}
 		else if(point2.y<point1.y){
 			if(point1.x > point2.x){
@@ -286,13 +272,10 @@ for(i = 0; i < (*rst).numNets; i ++){
 				newX = point2.x;
 			}    
 			fprintf(output,"(%d,%d)-(%d,%d)\n", newX, point2.y, newX, point1.y);
-			fprintf(stderr,"(%d,%d)-(%d,%d)\n", newX, point2.y, newX, point1.y);
 		}
 		
 		//fprintf(output, "(%d,%d)-(%d,%d)\n", point1.x, point1.y, point2.x, point2.y);
-		//fprintf(stderr, "(%d,%d)-(%d,%d)\n", point1.x, point1.y, point2.x, point2.y);
 	} 
-	fprintf(stderr, "!\n");
 fprintf(output, "!\n");
 }
 	
