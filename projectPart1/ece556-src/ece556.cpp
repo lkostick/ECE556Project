@@ -4,6 +4,7 @@
 
 
 // This function reads an input file and initializes all of the information
+// This function reads an input file and initializes all of the information
 // read from the file into a Routing instance
 // Input: fileName is the name of the file we will read from
 // Input: rst is a pointer to the routing instance we will save all of
@@ -13,36 +14,35 @@ int readBenchmark(const char *fileName, routingInst *rst){
 	
 	// initializes c-strings in order to store the information from the
 	// input file
-	char trash[10], g1[10], g2[10], capacity[10], n0[10], n1[10], netName[10], numNets[10], numbPins[10],numBlockages[10];
-	char x1[10], x2[10], y1[10], y2[10], newCap[10];
+	char trash[10], g1[10], g2[10], capacity[10], n0[10], n1[10], netName[10], numNets[10], numbPins[10],numBlockages[100];
+	char x1[100], x2[100], y1[100], y2[100], newCap[100];
 	// initializes ints used in the rest of the function
 	int i, j, intNumNets, intNumPins, h1, h2, intNumEdges, intNumBlockages;
 	int intx1, inty1, intx2, inty2, intnewCap, edge;
 	// Initializes the FILE pointer we will use to read the input file
 	FILE *input;
-  
+  input = fopen(fileName, "r");/*
   if((input = fopen(fileName, "r")) == NULL){
 	  fprintf(stderr, "Could not read file\n");
+	  fprintf(stderr, "pointer: %p\n", input);
 	  return 1;
-  }
+  }*/
+
   
 	// This scan and store statement scans the first line of the input
 	// file and stores the grid size gx and gy
   	fscanf(input, "%s %s %s", trash, g1, g2);
   	(*rst).gx = atoi(g1);
   	(*rst).gy = atoi(g2);
-  	//fprintf(stderr,"The input was: %s\n", trash);
   	
   	// This scan and store statement scans the second line of the input
   	// file and stores the capacity of the grid
 	fscanf(input, "%s %s\n", trash, capacity);
 	(*rst).cap = atoi(capacity);
-	//fprintf(stderr,"%s %s\n", trash, capacity);
-	
+	 	
 	// This scan and store statment scans the third line of the input 
 	// file and stores the number of nets there are
 	fscanf(input, "%s %s %s\n", trash, trash, numNets);
-	//fprintf(stderr,"%s %s %s\n", trash, trash, numNets);
 	intNumNets = atoi(numNets);
 	(*rst).numNets = intNumNets;
 	
@@ -50,8 +50,8 @@ int readBenchmark(const char *fileName, routingInst *rst){
 	// all of the nets that will be input from the input file
 	net  *newNetArray;
 	newNetArray = (net*)malloc(intNumNets*sizeof(net));
-	((*rst).nets)= newNetArray;
 	
+
 	// This for loop repeats for each net we will read from the input 
 	// file
 	for(i = 0; i < intNumNets; i++){
@@ -62,8 +62,6 @@ int readBenchmark(const char *fileName, routingInst *rst){
 		intNumPins = atoi(numbPins);
 		newNetArray[i].id = i;
 		newNetArray[i].numPins = intNumPins;
-		//fprintf(stderr, numNodes);
-		//fprintf(stderr, "\n");
 		
 		// Initilizes an array of points in order to store the next
 		// inputs from read from the input file in order to store all
@@ -78,39 +76,43 @@ int readBenchmark(const char *fileName, routingInst *rst){
 			// allocates a new point in order to store the information
 			// scanned. Then saves it to the net.
 			fscanf(input, "%s %s\n", n0, n1);
-			//fprintf(stderr, "%s %s\n", n0, n1);
-			point *newPoint = (point*)malloc(sizeof(point));
-			(*newPoint).x = atoi(n0);
-			(*newPoint).y = atoi(n1);
-			newPins[j]= *newPoint;
+			point newPoint;
+			(newPoint).x = atoi(n0);
+			(newPoint).y = atoi(n1);
+			newPins[j]= newPoint;
 			
 		}
 		newNetArray[i].pins = newPins;	
 		
 	}
+		
 	
 	// Saves the net array we just finished storing points to to the 
 	// Routing Instance we are using.
-	(*rst).nets[i] = *newNetArray;
+	(*rst).nets = newNetArray;
+	
+	
+	
 	// This creates ints that store the size of the grid we are using
 	h1 = atoi(g1);
 	h2 = atoi(g2);
-	
+
 	// This creates an int that stores the total number of edges we have
 	// and then saves it to the Routing Instance
 	intNumEdges = (h1*(h2-1))+(h2*(h1-1));
 	(*rst).numEdges = intNumEdges; 
+
 	
 	// This creates an array of ints that we will use to store the
 	// capacities of each edge
 	(*rst).edgeCaps = (int*)malloc(intNumEdges*sizeof(int));
 
+
 	// This for loop sets each edge capacity to the default
 	for(i = 0; i < (intNumEdges); i++){
 		(*rst).edgeCaps[i] = atoi(capacity);
 	}
-	
-	fprintf(stderr, "Got Here\n");
+
 	fscanf(input, "%s\n", numBlockages);
 	intNumBlockages = atoi(numBlockages);
 	fprintf(stderr, numBlockages);
@@ -123,25 +125,22 @@ int readBenchmark(const char *fileName, routingInst *rst){
 		inty2 = atof(y2); 
 		intnewCap = atoi(newCap);
 		edge = 0;
-		//fprintf(stderr, "x1:%s y1:%s x2:%s y2:%s Cap:%s\n", x1, y1, x2, y2, newCap);
+		fprintf(stderr, "x1:%s y1:%s x2:%s y2:%s Cap:%s\n", x1, y1, x2, y2, newCap);
 		
 		edge = pointsToEdge(h1, h2, intx1, inty1, intx2, inty2);
 		
-		
-		
-		//fprintf(stderr, "EDGE: %d\n", edge);
-		
 		(*rst).edgeCaps[edge] = intnewCap;
-		fprintf(std	err, "Got Here\n");
 	}
 	(*rst).edgeUtils = (int*)malloc(intNumEdges*sizeof(int));
 	for(i = 0; i < (intNumEdges); i++){
 		(*rst).edgeUtils[i] = 0;
 	}
-  fclose(input);// closes the file we opened
+	fprintf(stderr, "Got Hereaefawefaewf\n");
+	fprintf(stderr, "pointer: %p\n", input);
+	fclose(input);
+	fprintf(stderr, "Got Here\n");
   
-  
-fprintf(stderr, "Got Here\n");
+ 
   return 1;
 }
 
@@ -154,7 +153,6 @@ int solveRouting(routingInst *rst){
 int i, j, k;
 int numbNets, numbPins;
 numbNets = (*rst).numNets;
- 
 
 // This loop goes through each net, initializing a route and making 
 // the segments needed to populate the route
@@ -165,46 +163,44 @@ for(i = 0; i < numbNets; i ++){
 	
 	numbPins = (*rst).nets[i].numPins;
 	segment *segs = (segment*)malloc(sizeof(segment)*(numbPins-1));
+	int edgeCount;
+	
 	
 	// This loop creates all of the segmets that we will need to solve for
 	for(j = 0; j < (numbPins-1); j ++){
-		
 		
 		// 
 		point pin1 = (*rst). nets[i].pins[j];
 		point pin2 = (*rst). nets[i].pins[j+1];
 		fprintf(stderr, "pins pins: (%d,%d)-(%d,%d)\n", pin1.x, pin1.y, pin2.x, pin2.y);
 		
-		
 		segment curSeg;
-		curSeg.p1 = pin1;
-		curSeg.p2 = pin2;
-		
 		
 		// these statements initialize and store the difference in 
 		// vertical and horizontal change between points
 		int changex = abs((pin1.x) - (pin2.x));
 		int changey = abs((pin1.y) - (pin2.y));
-		curSeg.numEdges = changex + changey;
+		curSeg.numEdges = changex+changey;
+		curSeg.p1 = pin1;
+		curSeg.p2 = pin2;
 		
-		int curEdges[curSeg.numEdges];
-		int edgeCount = 0;
+		int *curEdges = (int*)malloc(sizeof(int)*curSeg.numEdges);
+		edgeCount = 0;
 		int gridx, gridy;
 		gridx = (*rst).gx;
 		gridy = (*rst).gy;
 		
-		// This loop creates all of the horizontal segments
+		// This loop creates all of the horizontal edges
 		for(k = 0; k < changex; k ++){
 			if(pin1.x < pin2.x){
 				curEdges[edgeCount] = pointsToEdge(gridx, gridy, pin1.x + k, pin1.y, (pin1.x) + 1 + k, pin1.y);
-				edgeCount ++;
+				edgeCount++;
 			}else{
 				curEdges[edgeCount] = pointsToEdge(gridx, gridy, pin2.x + k, pin2.y, (pin2.x) + 1 + k, pin2.y);
-				edgeCount ++;
+				edgeCount++;
 			}
 		}
-		
-		// This loop creates all of the vertical segments
+		// This loop creates all of the vertical edges
 		for(k = 0; k < changey; k ++){
 			if(pin1.y < pin2.y){
 				curEdges[edgeCount] = pointsToEdge(gridx, gridy, pin1.x, pin1.y + k, pin1.x, (pin1.y) + 1 + k);
@@ -214,13 +210,12 @@ for(i = 0; i < numbNets; i ++){
 				edgeCount++;
 			}
 		}
-		
-		
 		curSeg.edges = curEdges;
 		segs[j] = curSeg;
 		
 	} 
 	(*rst).nets[i].nroute.segments = segs;
+	(*rst).nets[i].nroute.numSegs = numbPins -1;
 }
 
 	// Returns 1 on successful completion
@@ -236,7 +231,7 @@ for(i = 0; i < numbNets; i ++){
 // Output: We will output 1 on successful completion of the function
 int writeOutput(const char *outRouteFile, routingInst *rst){
 
-int i, j;
+int i, j ,numberSegs;
 FILE *output;
 
  
@@ -245,26 +240,61 @@ if((output = fopen(outRouteFile, "w")) == NULL){
 	  return 0;
 }
 
+int xDistance, yDistance, newX, newY;
 
 for(i = 0; i < (*rst).numNets; i ++){
 	
 	fprintf(stderr, "n%d\n", i);
 	fprintf(output, "n%d\n", (*rst).nets[i].id);
-	
-	for(j = 0; j < (*rst).nets[i].nroute.numSegs; j ++){
-		
+
+	numberSegs = (*rst).nets[i].nroute.numSegs;
+	fprintf(stderr, "Number Segments:%d\n", numberSegs);
+	for(j = 0; j < numberSegs; j ++){
+
 		// initializes new points and sets them equal to the start and
 		// end point of the segment. Then prints out the start and 
 		// end point to the file in the appropriate format.
 		point point1, point2;
 		point1 = (*rst).nets[i].nroute.segments[j].p1;
 		point2 = (*rst).nets[i].nroute.segments[j].p2;
-		fprintf(output, "(%d,%d)-(%d,%d)\n", point1.x, point1.y, point2.x, point2.y);
-		fprintf(stderr, "(%d,%d)-(%d,%d)\n", point1.x, point1.y, point2.x, point2.y);
-	}
-}
-fprintf(stderr, "!\n");
+		fprintf(stderr, "Is logans shitty code broke?\n");
+		xDistance = abs(point1.x - point2.x);
+		yDistance = abs(point1.y - point2.y);
+		if(point1.x < point2.x){
+			newX = point1.x + xDistance;
+			fprintf(output,"(%d,%d)-(%d,%d)\n", point1.x, point1.y, point2.x, point1.y);
+			fprintf(stderr,"(%d,%d)-(%d,%d)\n", point1.x, point1.y, point2.x, point1.y);
+		}
+		else if(point2.x<point1.x){
+			newX = point2.x + xDistance;
+			fprintf(output,"(%d,%d)-(%d,%d)\n", point2.x, point2.y, point1.x, point2.y);
+			fprintf(stderr,"(%d,%d)-(%d,%d)\n", point2.x, point2.y, point1.x, point2.y);
+		}
+		if(point1.y < point2.y){
+			if(point1.x > point2.x){
+				newX = point1.x;
+			}else{
+				newX = point2.x;
+			}
+			fprintf(output,"(%d,%d)-(%d,%d)\n", newX, point1.y, newX, point2.y);
+			fprintf(stderr,"(%d,%d)-(%d,%d)\n", newX, point1.y, newX, point2.y);
+		}
+		else if(point2.y<point1.y){
+			if(point1.x > point2.x){
+				newX = point1.x;
+			}else{
+				newX = point2.x;
+			}    
+			fprintf(output,"(%d,%d)-(%d,%d)\n", newX, point2.y, newX, point1.y);
+			fprintf(stderr,"(%d,%d)-(%d,%d)\n", newX, point2.y, newX, point1.y);
+		}
+		
+		//fprintf(output, "(%d,%d)-(%d,%d)\n", point1.x, point1.y, point2.x, point2.y);
+		//fprintf(stderr, "(%d,%d)-(%d,%d)\n", point1.x, point1.y, point2.x, point2.y);
+	} 
+	fprintf(stderr, "!\n");
 fprintf(output, "!\n");
+}
 	
 	
 	
@@ -281,6 +311,7 @@ return 1;
 //			the memory.
 int release(routingInst *rst){
   /*********** TO BE FILLED BY YOU **********/
+  
 	int i,j;
 	int sizeNets,sizeSegments;
 	if(rst == NULL) return 0;
@@ -291,8 +322,6 @@ int release(routingInst *rst){
 		for(j = 0; j < sizeSegments; j++){ // Iterate through the segements in the route 
 			free(rst->nets[i].nroute.segments[j].edges);
 		}
-		free(rst->nets[i].nroute);
-		free((rst).nets[i]);
 		free(rst->nets[i].nroute.segments);
 	}
 	free(rst->nets);
@@ -316,7 +345,7 @@ int pointsToEdge(int x, int y, int x1, int y1, int x2, int y2){
 int edge;
 if(y1 == y2){
 	
-		edge = pow((x-1),y1);
+		edge = (x-1)*y1;
 		if(y1 == 0){
 			edge = edge -1;
 		}
@@ -330,12 +359,12 @@ if(y1 == y2){
 	edge = ((x-1)*y);
 	edge = edge + x1;
 	if(y1 < y2){
-		edge = edge + pow(x,y1);
+		edge = edge + (x*y1);
 		if(y1 == 0){
 			edge = edge -1;
 		}
 	}else{
-		edge = edge + pow(x,y2);
+		edge = edge + (x*y2);
 		if(y2 == 0){
 			edge = edge -1;
 		}
@@ -378,26 +407,3 @@ if(edgeNum <(numHoriz-1)){
 
 	return 1;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
